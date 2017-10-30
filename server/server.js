@@ -1,5 +1,6 @@
-var express = require('express');
-var bodyParser = require('body-parser'); //bodyparser takes JSON and turns it into an object
+const express = require('express');
+const bodyParser = require('body-parser'); //bodyparser takes JSON and turns it into an object
+const {ObjectID} = require('mongodb')
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -9,6 +10,7 @@ var app = express();
 
 app.use(bodyParser.json());
 
+//storing new todo send by POSTMAN
 app.post('/todos',(req,res)=>{
   var todo = new Todo({
     text: req.body.text
@@ -28,6 +30,26 @@ app.get('/todos',(req,res)=>{
   },(e)=>{
     res.status(400).send(e);
   });
+});
+
+// GET /todos/id : fetch todo by requested id
+app.get('/todos/:id', (req,res)=>{
+  var id = req.params.id;
+  //Validate id using isValid
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+
+  //findById(req.params.id)
+  Todo.findById(id).then((todo)=>{
+    if(!todo){
+      return res.status(404).send()
+    }
+      res.send({todo}); //we added {} so the response is an object we can now use the properties.
+
+  }).catch((e)=>res.status(400).send());
+
+
 });
 
 app.listen(3000,()=>{
