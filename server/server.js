@@ -60,11 +60,11 @@ app.delete('/todos/:id',(req,res)=>{
     return res.status(404).send();
   }
   //remove todo by id
-  Todo.findByIdAndRemove(id).then((done)=>{
-    if(!done){
-      return res.status(404).send;
+  Todo.findByIdAndRemove(id).then((todo)=>{
+    if(!todo){
+      return res.status(404).send();
     }
-    res.send(done);
+    res.send({todo}); //we added {} so the response is an object we can now use the properties.
   }).catch((e)=>res.status(400).send())
 });
 
