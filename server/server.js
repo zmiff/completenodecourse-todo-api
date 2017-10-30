@@ -48,8 +48,6 @@ app.get('/todos/:id', (req,res)=>{
       res.send({todo}); //we added {} so the response is an object we can now use the properties.
 
   }).catch((e)=>res.status(400).send());
-
-
 });
 
 app.listen(3000,()=>{
