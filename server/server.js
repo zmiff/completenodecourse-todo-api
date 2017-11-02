@@ -1,6 +1,8 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser'); //bodyparser takes JSON and turns it into an object
 const {ObjectID} = require('mongodb')
+
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -68,7 +70,33 @@ app.delete('/todos/:id',(req,res)=>{
   }).catch((e)=>res.status(400).send())
 });
 
+// PATCH / id updating DOC
 
+app.patch('/todos/:id',(req,res)=>{
+  var id=req.params.id;
+  var body =_.pick(req.body,['text', 'completed']); //this is so users can only uptade text and completed.
+  //check to see if id is valid
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+
+  if(_.isBoolean(body.completed)&&body.completed){ //is body.completed a boolean and is it true?
+    body.completedAt = new Date().getTime(); //sets the completed at time
+  }else{
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo)=>{
+    if(!todo){
+      return res.status(404).send();
+    }
+    res.send({todo})
+  }).catch((e)=>{
+      res.status(400).send();
+  });
+
+});
 
 app.listen(port,()=>{
   console.log(`Started on ${port}.`)
