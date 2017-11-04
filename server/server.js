@@ -100,6 +100,22 @@ app.patch('/todos/:id',(req,res)=>{
 
 });
 
+//post new user
+app.post(('/users/'),(req,res)=>{
+  //pick body object
+  var body =_.pick(req.body,['email', 'password']);
+  //store attributes in new user
+  var user = new User(body);
+  // save the doc to the collection
+  user.save().then(()=>{
+    return user.generateAuthToken();
+  }).then((token)=>{
+    res.header('x-auth', token).send(user);
+  }).catch((e)=>{
+    res.status(400).send(e);
+  });
+});
+
 app.listen(port,()=>{
   console.log(`Started on ${port}.`)
 });
