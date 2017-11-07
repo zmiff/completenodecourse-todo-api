@@ -136,10 +136,14 @@ app.post(('/users/login'),(req,res)=>{
   });
 
 });
-//find user in col who 1 has matching email and compare password bcrypt.compare
-//pick email and password from body
-//res.send body
-//check in postman
+
+app.delete('/users/me/token',authenticate,(req,res)=>{
+  req.user.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  }, ()=>{
+    res.status(400).send();
+  });
+});
 
 
 app.listen(port,()=>{
