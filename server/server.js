@@ -123,6 +123,25 @@ app.get('/users/me', authenticate,(req,res)=>{
   res.send(req.user);
 });
 
+// POST /users/login {email, password}
+app.post(('/users/login'),(req,res)=>{
+  var body =_.pick(req.body,['email','password']);
+
+  User.FindByCredentials(body.email,body.password).then((user)=>{
+    user.generateAuthToken().then((token)=>{
+      res.header('x-auth', token).send(user);
+    });
+  }).catch((e)=>{
+    res.status(400).send();
+  });
+
+});
+//find user in col who 1 has matching email and compare password bcrypt.compare
+//pick email and password from body
+//res.send body
+//check in postman
+
+
 app.listen(port,()=>{
   console.log(`Started on ${port}.`)
 });
